@@ -1,0 +1,99 @@
+/* Container for the whole form */
+.add-recipe-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #f5fafd; /* soft background */
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Form heading */
+.add-recipe-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Form element spacing */
+.add-recipe-form input,
+.add-recipe-form textarea,
+.add-recipe-form select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+/* Input focus effect */
+.add-recipe-form input:focus,
+.add-recipe-form textarea:focus,
+.add-recipe-form select:focus {
+  border-color: #00bcd4; /* aqua color */
+  outline: none;
+}
+
+/* Textarea height */
+.add-recipe-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Submit button */
+.add-recipe-form button {
+  width: 100%;
+  padding: 14px 0;
+  background-color: #00bcd4;
+  color: white;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+.add-recipe-form button:hover {
+  background-color: #0097a7;
+}
+
+/* Optional: placeholder color */
+.add-recipe-form ::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .add-recipe-container {
+    padding: 20px;
+    margin: 20px;
+  }
+}
+
+
+
+.popup-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #3c3d3d;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  animation: fadeInOut 2.5s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
