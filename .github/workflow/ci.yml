@@ -1,0 +1,54 @@
+# .github/workflows/ci.yml
+name: MERN App CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_and_push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          # This is the correct and secure way. It uses the secrets you
+          # configured in your GitHub repository settings.
+          # NEVER paste your actual username or token directly into this file.
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          # UPDATED: Changed the tag to match your 'Crispy-kitchen' project
+          tags: bhuvnesharma/crispy-kitchen-backend:latest
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          # UPDATED: Changed the tag to match your 'Crispy-kitchen' project
+          tags: bhuvnesharma/crispy-kitchen-frontend:latest
+          
+      - name: Build and Push Nginx Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          push: true
+          # ADDED: A new step to build the Nginx image for your reverse proxy
+          tags: bhuvnesharma/crispy-kitchen-nginx:latest
+
+      - name: Trigger Jenkins CD Job
+        run: |
+          # This command will securely use your Jenkins secrets to start the deployment
+          curl -X POST ${{ secrets.JENKINS_URL }}/job/MERN-App-Deploy/build \
+            --user ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_API_TOKEN }}
+
