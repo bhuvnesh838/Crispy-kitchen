@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');yield
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
@@ -10,7 +10,14 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey123";
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_CODE = process.env.ADMIN_CODE;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+if (!JWT_SECRET || !ADMIN_CODE || !process.env.MONGODB_URI) {
+  console.error("FATAL ERROR: Missing required environment variables (JWT_SECRET, ADMIN_CODE, MONGODB_URI).");
+  process.exit(1);
+}
 
 app.use(express.json());
 app.use(cors());
@@ -36,16 +43,11 @@ const authenticate = (req, res, next) => {
 };
 
 // Authorize admin
-const authorizeAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.userId);
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admins only.' });
-    }
-    next();
-  } catch (err) {
-    return res.status(500).json({ message: 'Server error', error: err.message });
+const authorizeAdmin = (req, res, next) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Admins only.' });
   }
+  next();
 };
 
 // ------------------ User Routes ------------------
@@ -61,8 +63,7 @@ app.post('/api/users/signup', async (req, res) => {
 
     let assignedRole = 'user';
     if (role === 'admin') {
-      const ADMIN_CODE = process.env.ADMIN_CODE || 'secret123';
-      if (adminCode !== ADMIN_CODE) return res.status(401).json({ message: 'Invalid admin code' });
+      if (adminCode !== ADMIN_CODE) return res.status(403).json({ message: 'Invalid admin code' });
       assignedRole = 'admin';
     }
 
@@ -211,7 +212,7 @@ app.post('/api/users/forgot-password', async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const resetToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '15m' });
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
+    const resetLink = `${FRONTEND_URL}/reset-password?token=${resetToken}&email=${email}`;
     res.status(200).json({ message: 'Reset link generated', resetLink });
   } catch (error) {
     console.error(error);
